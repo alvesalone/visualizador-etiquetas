@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Visualizador de Etiquetas ZPL / EPL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/a2d9caaa6a.js" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg-color: #1e1e2f;
+      --container-bg: #2c2c3c;
+      --text-color: #f0f0f0;
+      --accent-color: #3b82f6;
+      --accent-hover: #2563eb;
+      --border-color: #444;
+      --footer-bg: #111827;
+      --input-bg: #1f1f2f;
+    }
+
+    [data-theme='light'] {
+      --bg-color: #f5f5f5;
+      --container-bg: #ffffff;
+      --text-color: #1e1e1e;
+      --accent-color: #3b82f6;
+      --accent-hover: #2563eb;
+      --border-color: #ccc;
+      --footer-bg: #eaeaea;
+      --input-bg: #fff;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    header {
+      background-color: var(--footer-bg);
+      color: var(--text-color);
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      cursor: pointer;
+      font-size: 18px;
+      background: none;
+      border: none;
+      color: var(--text-color);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: var(--container-bg);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    select,
+    textarea,
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid var(--border-color);
+      font-size: 14px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+    }
+
+    button {
+      background-color: var(--accent-color);
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      transition: background-color 0.2s ease;
+      margin-right: 10px;
+    }
+
+    button:hover {
+      background-color: var(--accent-hover);
+    }
+
+    button i {
+      margin-right: 8px;
+    }
+
+    #preview {
+      margin-top: 25px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      padding: 20px;
+      background-color: var(--input-bg);
+      text-align: center;
+    }
+
+    #labelImage {
+      max-width: 100%;
+      border: 1px dashed #666;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #fff;
+    }
+
+    #errorMsg {
+      color: #ff6b6b;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .history {
+      margin-top: 30px;
+    }
+
+    .history h3 {
+      margin-bottom: 10px;
+    }
+
+    .history-item {
+      display: inline-block;
+      width: 100px;
+      margin: 5px;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .history-item:hover {
+      border-color: var(--accent-color);
+    }
+
+    .history-item img {
+      width: 100%;
+      border-radius: 4px;
+    }
+
+    footer {
+      background-color: var(--footer-bg);
+      color: #888;
+      text-align: center;
+      padding: 15px;
+      margin-top: 30px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+
+      header h1 {
+        font-size: 20px;
+      }
+
+      button {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      .theme-toggle {
+        top: 10px;
+        right: 10px;
+      }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <button class="theme-toggle" onclick="toggleTheme()">
+    <i class="fas fa-adjust"></i> Tema
+  </button>
+
+  <header>
+    <h1><i class="fas fa-barcode"></i> Visualizador de Etiquetas ZPL / EPL</h1>
+  </header>
+
+  <div class="container">
+    <label for="langSelect">Tipo de código:</label>
+    <select id="langSelect">
+      <option value="zpl">ZPL</option>
+      <option value="epl">EPL</option>
+    </select>
+
+    <label for="dpi">DPI:</label>
+    <select id="dpi">
+      <option value="6dpmm">152 DPI</option>
+      <option value="8dpmm" selected>203 DPI</option>
+      <option value="12dpmm">300 DPI</option>
+    </select>
+
+    <label for="size">Tamanho da etiqueta (LxA):</label>
+    <input id="size" value="4x6" placeholder="Ex: 4x6" />
+
+    <label for="codeInput">Cole seu código aqui:</label>
+    <textarea id="codeInput" rows="6" placeholder="Ex: ^XA^FO50,50^ADN,36,20^FDZebra ZPL!^FS^XZ"></textarea>
+
+    <div>
+      <button onclick="renderLabel()"><i class="fas fa-eye"></i> Visualizar</button>
+      <button onclick="copyCode()"><i class="fas fa-copy"></i> Copiar Código</button>
+    </div>
+
+    <div id="preview">
+      <p><strong>Pré-visualização da etiqueta:</strong></p>
+      <img id="labelImage" alt="Etiqueta aparecerá aqui" />
+      <div id="errorMsg"></div>
+    </div>
+
+    <div class="history" id="history">
+      <h3>Histórico:</h3>
+      <div id="historyItems"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Desenvolvido por <strong>Joseph Alves</strong>.</p>
+  </footer>
+
+  <script>
+    const codeInput = document.getElementById('codeInput');
+    const labelImage = document.getElementById('labelImage');
+    const errorMsg = document.getElementById('errorMsg');
+    const historyItems = document.getElementById('historyItems');
+
+    function renderLabel() {
+      const code = codeInput.value.trim();
+      const type = document.getElementById('langSelect').value;
+      const dpi = document.getElementById('dpi').value;
+      const size = document.getElementById('size').value.trim();
+
+      errorMsg.textContent = "";
+      labelImage.src = "";
+      labelImage.alt = "Carregando etiqueta...";
+
+      if (!code) {
+        errorMsg.textContent = "Por favor, cole um código válido ZPL ou EPL.";
+        labelImage.alt = "Etiqueta não disponível.";
+        return;
+      }
+
+      if (!/^\d+x\d+$/.test(size)) {
+        errorMsg.textContent = "Formato de tamanho inválido. Use formato LxA como 4x6.";
+        labelImage.alt = "Etiqueta não disponível.";
+        return;
+      }
+
+      const url = `https://api.labelary.com/v1/printers/${dpi}/labels/${size}/0/`;
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "image/png",
+          "X-Label-Format": type
+        },
+        body: code
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("Erro ao renderizar. Verifique o código.");
+        return response.blob();
+      })
+      .then(blob => {
+        const imageUrl = URL.createObjectURL(blob);
+        labelImage.src = imageUrl;
+        labelImage.alt = "Etiqueta gerada com sucesso.";
+        addToHistory(imageUrl, code);
+      })
+      .catch(error => {
+        errorMsg.textContent = "Erro: " + error.message;
+        labelImage.alt = "Erro ao carregar a etiqueta.";
+      });
+    }
+
+    function copyCode() {
+      navigator.clipboard.writeText(codeInput.value).then(() => {
+        alert("Código copiado!");
+      });
+    }
+
+    function addToHistory(imageUrl, code) {
+      let history = JSON.parse(localStorage.getItem("labelHistory")) || [];
+      history.unshift({ imageUrl, code });
+      history = history.slice(0, 5); // manter até 5
+      localStorage.setItem("labelHistory", JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const history = JSON.parse(localStorage.getItem("labelHistory")) || [];
+      historyItems.innerHTML = "";
+
+      history.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "history-item";
+        div.innerHTML = `<img src="${item.imageUrl}" alt="Etiqueta ${index + 1}" />`;
+        div.onclick = () => {
+          codeInput.value = item.code;
+          renderLabel();
+        };
+        historyItems.appendChild(div);
+      });
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      const newTheme = body.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      body.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+    }
+
+    function loadTheme() {
+      const savedTheme = localStorage.getItem("theme") || "dark";
+      document.body.setAttribute("data-theme", savedTheme);
+    }
+
+    window.onload = function () {
+      loadTheme();
+      renderHistory();
+    };
+  </script>
+
+</body>
+</html>
